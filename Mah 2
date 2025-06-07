@@ -1,0 +1,70 @@
+-- Silent Aim Module (for loadstring use)
+if not game:IsLoaded() then game.Loaded:Wait() end
+if not syn or not protectgui then getgenv().protectgui = function() end end
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local silentAimEnabled = false
+local wallCheckEnabled = false
+
+local rawMt = getrawmetatable or debug.getmetatable
+local setRo = setreadonly or make_writeable or function() end
+local makeClosure = newcclosure or function(f) return f end
+
+local function isVisible(pos)
+    local origin = Camera.CFrame.Position
+    local rayParams = RaycastParams.new()
+    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+    rayParams.FilterDescendantsInstances = {LocalPlayer.Character, Camera}
+
+    local result = workspace:Raycast(origin, (pos - origin).Unit * 999, rayParams)
+    return not result or (result.Position - pos).Magnitude < 2
+end
+
+local function getClosestEnemy()
+    local closest = nil
+    local shortest = math.huge
+    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+    if not hrp then return nil end
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local enemyHRP = player.Character.HumanoidRootPart
+            local distance = (hrp.Position - enemyHRP.Position).Magnitude
+
+            if distance < shortest and (not wallCheckEnabled or isVisible(enemyHRP.Position)) then
+                shortest = distance
+                closest = player
+            end
+        end
+    end
+
+    return closest
+end
+
+-- Index Hook
+local mt = rawMt(game)
+setRo(mt, false)
+local oldIndex = mt.__index
+
+mt.__index = makeClosure(function(t, k)
+    if typeof(t) == "Instance" and t:IsA("Mouse") and silentAimEnabled and (k == "Target" or k == "Hit") then
+        local target = getClosestEnemy()
+        if target and target.Character then
+            local part = target.Character:FindFirstChild("HumanoidRootPart")
+            if part then
+                return k == "Target" and part or part.CFrame
+            end
+        end
+    end
+    return oldIndex(t, k)
+end)
+
+-- Return module control functions
+return {
+    SetSilentAim = function(state) silentAimEnabled = state end,
+    SetWallCheck = function(state) wallCheckEnabled = state end
+}
