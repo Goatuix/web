@@ -1,4 +1,3 @@
--- Silent Aim Module (for loadstring use)
 if not game:IsLoaded() then game.Loaded:Wait() end
 if not syn or not protectgui then getgenv().protectgui = function() end end
 
@@ -45,7 +44,7 @@ local function getClosestEnemy()
     return closest
 end
 
--- Index Hook
+
 local mt = rawMt(game)
 setRo(mt, false)
 local oldIndex = mt.__index
@@ -63,7 +62,7 @@ mt.__index = makeClosure(function(t, k)
     return oldIndex(t, k)
 end)
 
--- Return module control functions
+
 return {
     SetSilentAim = function(state) silentAimEnabled = state end,
     SetWallCheck = function(state) wallCheckEnabled = state end
