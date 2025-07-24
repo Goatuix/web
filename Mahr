@@ -105,21 +105,11 @@ local function GetImageData(name:string,image:ImageLabel)
 	end
 
 	if name == "mouse" then
-		image.Image = "rbxassetid://134840978698947"
-		image.ImageRectOffset = Vector2.new(0, 0)
-		image.ImageRectSize = Vector2.new(0, 0)
+		image.Image = "rbxassetid://3515393063"
 	end
 
 	if name == "user" then
 		image.Image = "rbxassetid://10494577250"
-		image.ImageRectOffset = Vector2.new(0, 0)
-		image.ImageRectSize = Vector2.new(0, 0)
-	end
-
-	if name == "sword" then
-		image.Image = "rbxassetid://1095708"
-		image.ImageRectOffset = Vector2.new(0, 0)
-		image.ImageRectSize = Vector2.new(0, 0)
 	end
 end
 
@@ -179,24 +169,12 @@ function NEVERLOSE:Theme(name)
 		NEVERLOSE.Themes.StrokeColor = Color3.fromRGB(28, 28, 28)
 		NEVERLOSE.Themes.ButtonBlackgroundColor = Color3.fromRGB(13, 13, 13)
 	end
-
-	if name == "slur" then
-		NEVERLOSE.Themes.BlackgroundColor = Color3.fromRGB(45, 15, 35)
-		NEVERLOSE.Themes.BlackColor = Color3.fromRGB(25, 8, 20)
-		NEVERLOSE.Themes.HeaderColor = Color3.fromRGB(35, 12, 28)
-		NEVERLOSE.Themes.TraceColor = Color3.fromRGB(55, 18, 45)
-		NEVERLOSE.Themes.MainColor = Color3.fromRGB(255, 105, 180)
-		NEVERLOSE.Themes.MainColorDrop = Color3.fromRGB(85, 28, 68)
-		NEVERLOSE.Themes.SectionColor = Color3.fromRGB(30, 10, 25)
-		NEVERLOSE.Themes.StrokeColor = Color3.fromRGB(65, 22, 52)
-		NEVERLOSE.Themes.ButtonBlackgroundColor = Color3.fromRGB(35, 12, 28)
-	end
 end
 
 function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 	local WindowFunctinos={}
 	local ToggleUI=false
-	local ooldsize=UICustomSize or UDim2.new(0.28, 260, 0.28, 220)
+	local ooldsize=UICustomSize or UDim2.new(0.200000003, 210, 0.200000003, 175)
 	local Tabs={}
 
 	local ScreenGui = Instance.new("ScreenGui")
@@ -309,30 +287,38 @@ function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 	task.spawn(function()
 		local ImageButton = Instance.new("ImageButton")
 
-		ImageButton.Parent = CoreGui
+		ImageButton.Parent = Frame
 		ImageButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		ImageButton.BackgroundTransparency = 1.000
 		ImageButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ImageButton.BorderSizePixel = 0
-		ImageButton.Position = UDim2.new(0.01, 0, 0.2, 0)
-		ImageButton.Size = UDim2.new(0, 48, 0, 48)
+		ImageButton.Position = UDim2.new(0.908723712, 0, 0.0239103697, 0)
+		ImageButton.Size = UDim2.new(0.0900000036, 0, 0.0900000036, 0)
 		ImageButton.SizeConstraint = Enum.SizeConstraint.RelativeYY
-		ImageButton.ZIndex = 10000
-		ImageButton.Image = "rbxassetid://108433148946093"
+		ImageButton.ZIndex = 4
+		ImageButton.Image = "rbxassetid://10002398990"
 		ImageButton.ScaleType = Enum.ScaleType.Fit
-		ImageButton.Visible = false
-
-		local function updateOpenerVisibility()
-			ImageButton.Visible = not toggle_valu
-		end
 
 		ImageButton.MouseButton1Click:Connect(function()
-			toggle_valu = true
-			ui_toggleong(toggle_valu)
-			updateOpenerVisibility()
-		end)
+			toggle_valu=not toggle_valu
 
-		updateOpenerVisibility()
+			if toggle_valu then
+				oldPositionClose = Frame.Position
+				TweenService:Create(ImageButton,TweenInfo.new(0.5),{
+					Size=UDim2.new(0.0900000036, 0, 0.0900000036, 0),
+					Position=UDim2.new(0.908723712, 0, 0.0239103697, 0),
+					AnchorPoint=Vector2.new(0,0)
+				}):Play()
+			else
+				TweenService:Create(ImageButton,TweenInfo.new(0.5),{
+					Size=UDim2.new(0.3, 0,0.3, 0),
+					Position=UDim2.new(1,0,-0.009,0),
+					AnchorPoint=Vector2.new(1,0)
+				}):Play()
+			end
+
+			ui_toggleong(toggle_valu)
+		end)
 	end)
 
 	task.spawn(function()
@@ -1560,7 +1546,7 @@ function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 				Dropdown.BorderColor3 = Color3.fromRGB(0, 0, 0)
 				Dropdown.BorderSizePixel = 0
 				Dropdown.Position = UDim2.new(0.0500000231, 0, 0.601014614, 0)
-				Dropdown.Size = UDim2.new(1.2, 0, -0.351014495, 0)
+				Dropdown.Size = UDim2.new(0.899999976, 0, -0.351014495, 0)
 				Dropdown.ZIndex = 5
 
 				UIAspectRatioConstraint.Parent = Dropdown
@@ -1597,7 +1583,7 @@ function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 				TopBar.BorderColor3 = Color3.fromRGB(0, 0, 0)
 				TopBar.BorderSizePixel = 0
 				TopBar.Position = UDim2.new(0.950000167, 0, 0.500000715, 0)
-				TopBar.Size = UDim2.new(0.45, 0, 0.5, 0)
+				TopBar.Size = UDim2.new(0.313529521, 0, 0.5, 0)
 				TopBar.ZIndex = 6
 
 				UICorner_2.CornerRadius = UDim.new(0, 3)
@@ -1653,7 +1639,7 @@ function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 				DownBar.BorderColor3 = Color3.fromRGB(0, 0, 0)
 				DownBar.BorderSizePixel = 0
 				DownBar.Position = UDim2.new(0.948214233, 0, 0.873961239, 0)
-				DownBar.Size = UDim2.new(0.45, 0, 0, 0)
+				DownBar.Size = UDim2.new(0.308999985, 0, 0, 0)
 				DownBar.Visible = false
 				DownBar.ZIndex = 10
 
@@ -1707,9 +1693,9 @@ function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 
 				local function auto_updatea()
 					if DropdownToggle then
-						TweenService:Create(DownBar,TweenInfo.new(0.1),{Size=UDim2.new(0.45,0,0,get_list_v4())}):Play()
+						TweenService:Create(DownBar,TweenInfo.new(0.1),{Size=UDim2.new(0.4,0,0,get_list_v4())}):Play()
 					else
-						TweenService:Create(DownBar,TweenInfo.new(0.1),{Size=UDim2.new(0.45,0,0,0)}):Play()
+						TweenService:Create(DownBar,TweenInfo.new(0.1),{Size=UDim2.new(0.4,0,0,0)}):Play()
 					end
 				end
 
@@ -1719,7 +1705,7 @@ function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 						TweenService:Create(Icon,TweenInfo.new(0.15),{Rotation=90}):Play()
 						TweenService:Create(LabelText,TweenInfo.new(0.4),{TextTransparency=0}):Play()
 
-						TweenService:Create(DownBar,TweenInfo.new(0.1),{Size=UDim2.new(0.45,0,0,get_list_size())}):Play()
+						TweenService:Create(DownBar,TweenInfo.new(0.1),{Size=UDim2.new(0.4,0,0,get_list_size())}):Play()
 
 						auto_updatea()
 
@@ -1747,7 +1733,7 @@ function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 						TweenService:Create(Icon,TweenInfo.new(0.15),{Rotation=-90}):Play()
 						TweenService:Create(LabelText,TweenInfo.new(0.4),{TextTransparency=0.3}):Play()
 
-						TweenService:Create(DownBar,TweenInfo.new(0.1),{Size=UDim2.new(0.45,0,0,0)}):Play()
+						TweenService:Create(DownBar,TweenInfo.new(0.1),{Size=UDim2.new(0.4,0,0,0)}):Play()
 					end
 				end
 
@@ -1892,29 +1878,6 @@ function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 			if dragToggle then
 				updateInput(input)
 			end
-		end
-	end)
-
-	-- Add Close Button to Main GUI
-	local CloseButton = Instance.new("ImageButton")
-	CloseButton.Name = "CloseButton"
-	CloseButton.Parent = Frame
-	CloseButton.AnchorPoint = Vector2.new(1, 0)
-	CloseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	CloseButton.BackgroundTransparency = 1.0
-	CloseButton.BorderSizePixel = 0
-	CloseButton.Position = UDim2.new(0.99, 0, 0.01, 0)
-	CloseButton.Size = UDim2.new(0, 32, 0, 32)
-	CloseButton.SizeConstraint = Enum.SizeConstraint.RelativeYY
-	CloseButton.ZIndex = 1000
-	CloseButton.Image = "rbxassetid://9127564477"
-	CloseButton.ScaleType = Enum.ScaleType.Fit
-
-	CloseButton.MouseButton1Click:Connect(function()
-		toggle_valu = false
-		ui_toggleong(false)
-		if typeof(updateOpenerVisibility) == "function" then
-			updateOpenerVisibility()
 		end
 	end)
 
