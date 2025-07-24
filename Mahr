@@ -1431,14 +1431,19 @@ function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 				local dragging = false
 
 				local function roundToIncrement(val)
-					local mult = 1/Increment
+					local mult = 1/(Increment or 1)
 					return math.floor(val * mult + 0.5) / mult
 				end
 
 				local function setValue(newValue, fireCallback)
 					newValue = math.clamp(roundToIncrement(newValue), Min, Max)
 					value = newValue
-					ValueText.Text = tostring(newValue)
+					-- Show decimals if increment < 1, else int
+					if (Increment or 1) < 1 then
+						ValueText.Text = string.format("%."..tostring(math.max(1, select(2, math.modf(1/(Increment or 1)))) ).."f", newValue)
+					else
+						ValueText.Text = tostring(newValue)
+					end
 					local percent = (newValue - Min) / (Max - Min)
 					BarFill.Size = UDim2.new(percent, 0, 1, 0)
 					Knob.Position = UDim2.new(percent, 0, 0.5, 0)
@@ -1499,7 +1504,7 @@ function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 				-- Mouse wheel support
 				BarBG.InputChanged:Connect(function(input)
 					if input.UserInputType == Enum.UserInputType.MouseWheel then
-						local delta = input.Position.Z > 0 and Increment or -Increment
+						local delta = input.Position.Z > 0 and (Increment or 1) or -(Increment or 1)
 						setValue(value + delta, true)
 					end
 				end)
@@ -1514,6 +1519,144 @@ function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 
 				function func:Text(t)
 					LabelText.Text = tostring(t)
+				end
+
+				update_section_size()
+				return func
+			end
+				Box.Name = "Box"
+				Box.Parent = Slider
+				Box.AnchorPoint = Vector2.new(0, 0.5)
+				Box.BackgroundColor3 = NEVERLOSE.Themes.ButtonBlackgroundColor
+				Box.BackgroundTransparency = 0.100
+				Box.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				Box.BorderSizePixel = 0
+				Box.Position = UDim2.new(0.800000012, 0, 0.5, 0)
+				Box.Size = UDim2.new(0.150000006, 0, 0.5, 0)
+				Box.ZIndex = 6
+
+				UICorner_2.CornerRadius = UDim.new(0, 3)
+				UICorner_2.Parent = Box
+
+				UIStroke.Thickness = 0.500
+				UIStroke.Color = NEVERLOSE.Themes.StrokeColor
+				UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				UIStroke.Parent = Box
+
+				ValueText.Name = "ValueText"
+				ValueText.Parent = Box
+				ValueText.AnchorPoint = Vector2.new(0.5, 0.5)
+				ValueText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				ValueText.BackgroundTransparency = 1.000
+				ValueText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				ValueText.BorderSizePixel = 0
+				ValueText.Position = UDim2.new(0.5, 0, 0.5, 0)
+				ValueText.Size = UDim2.new(0.99000001, 0, 0.99000001, 0)
+				ValueText.ZIndex = 6
+				ValueText.Font = Enum.Font.SourceSansSemibold
+				ValueText.Text = tostring(Default)
+				ValueText.TextColor3 = Color3.fromRGB(255, 255, 255)
+				ValueText.TextScaled = true
+				ValueText.TextSize = 14.000
+				ValueText.TextWrapped = true
+
+				MoveFrame.Name = "MoveFrame"
+				MoveFrame.Parent = Slider
+				MoveFrame.AnchorPoint = Vector2.new(0, 0.5)
+				MoveFrame.BackgroundColor3 = NEVERLOSE.Themes.MainColorDrop
+				MoveFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				MoveFrame.BorderSizePixel = 0
+				MoveFrame.ClipsDescendants = true
+				MoveFrame.Position = UDim2.new(0.477050841, 0, 0.50000006, 0)
+				MoveFrame.Size = UDim2.new(0.290949076, 0, 0.099999994, 0)
+				MoveFrame.ZIndex = 5
+
+				UICorner_3.CornerRadius = UDim.new(0, 3)
+				UICorner_3.Parent = MoveFrame
+
+				Inline.Name = "Inline"
+				Inline.Parent = MoveFrame
+				Inline.AnchorPoint = Vector2.new(0, 0.5)
+				Inline.BackgroundColor3 = NEVERLOSE.Themes.MainColor
+				Inline.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				Inline.BorderSizePixel = 0
+				Inline.Position = UDim2.new(0, 0, 0.5, 0)
+				Inline.Size = UDim2.new((Default/Max), 0, 1, 0)
+				Inline.ZIndex = 5
+
+				UICorner_4.CornerRadius = UDim.new(0, 3)
+				UICorner_4.Parent = Inline
+
+				Cir.Name = "Cir"
+				Cir.Parent = Inline
+				Cir.AnchorPoint = Vector2.new(1, 0.5)
+				Cir.BackgroundColor3 = NEVERLOSE.Themes.MainColor
+				Cir.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				Cir.BorderSizePixel = 0
+				Cir.Position = UDim2.new(1, 0, 0.5, 0)
+				Cir.Rotation = 0.010
+				Cir.Size = UDim2.new(3, 0, 3, 0)
+				Cir.SizeConstraint = Enum.SizeConstraint.RelativeYY
+				Cir.ZIndex = 5
+
+				UICorner_5.CornerRadius = UDim.new(0.5, 0)
+				UICorner_5.Parent = Cir
+
+				Frame.Parent = Slider
+				Frame.AnchorPoint = Vector2.new(0, 0.5)
+				Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				Frame.BackgroundTransparency = 1.000
+				Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				Frame.BorderSizePixel = 0
+				Frame.Position = UDim2.new(0.477050841, 0, 0.500000358, 0)
+				Frame.Size = UDim2.new(0.322948873, 0, 0.900000036, 0)
+				Frame.ZIndex = 5
+
+				local danger = false
+
+				local function update(Input)
+					local SizeScale = math.clamp((((Input.Position.X) - MoveFrame.AbsolutePosition.X) / MoveFrame.AbsoluteSize.X), 0, 1)
+					local Valuea = math.floor(((Max - Min) * SizeScale) + Min)
+					local Size = UDim2.fromScale(math.clamp(SizeScale+0.15,0,1), 1)
+					ValueText.Text = tostring(Valuea)
+					TweenService:Create(Inline,TweenInfo.new(0.1),{Size = Size}):Play()
+					callback(Valuea)
+				end
+
+				Frame.InputBegan:Connect(function(Input)
+					if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+						danger = true
+						update(Input)
+						TweenService:Create(LabelText,TweenInfo.new(0.1),{TextTransparency=0}):Play()
+					end
+				end)
+
+				Frame.InputEnded:Connect(function(Input)
+					if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+						danger = false
+						TweenService:Create(LabelText,TweenInfo.new(0.1),{TextTransparency=0.3}):Play()
+					end
+				end)
+
+				InputService.InputChanged:Connect(function(Input)
+					if danger then
+						if (Input.UserInputType==Enum.UserInputType.MouseMovement or Input.UserInputType==Enum.UserInputType.Touch)  then
+							update(Input)
+						end
+					end
+				end)
+
+				local func={}
+
+				function func:Value(s)
+					ValueText.Text = tostring(s)
+					Inline.Size=UDim2.fromScale((s/Max),1)
+
+					callback(s)
+				end
+
+				function func:Text(t)
+					LabelText.Text=tostring(t)
 				end
 
 				update_section_size()
