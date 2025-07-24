@@ -174,7 +174,7 @@ end
 function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 	local WindowFunctinos={}
 	local ToggleUI=false
-	local ooldsize=UICustomSize or UDim2.new(1, 110, 1, 165)
+	local ooldsize=UICustomSize or UDim2.new(0.200000003, 210, 0.200000003, 175)
 	local Tabs={}
 
 	local ScreenGui = Instance.new("ScreenGui")
@@ -318,6 +318,28 @@ function NEVERLOSE:AddWindow(NameScriptHub,Text,UICustomSize)
 			end
 
 			ui_toggleong(toggle_valu)
+		end)
+		
+		-- Bind 'O' key to toggle UI
+		InputService.InputBegan:Connect(function(input, processed)
+			if not processed and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.O then
+				toggle_valu = not toggle_valu
+				if toggle_valu then
+					oldPositionClose = Frame.Position
+					TweenService:Create(ImageButton,TweenInfo.new(0.5),{
+						Size=UDim2.new(0.0900000036, 0, 0.0900000036, 0),
+						Position=UDim2.new(0.908723712, 0, 0.0239103697, 0),
+						AnchorPoint=Vector2.new(0,0)
+					}):Play()
+				else
+					TweenService:Create(ImageButton,TweenInfo.new(0.5),{
+						Size=UDim2.new(0.3, 0,0.3, 0),
+						Position=UDim2.new(1,0,-0.009,0),
+						AnchorPoint=Vector2.new(1,0)
+					}):Play()
+				end
+				ui_toggleong(toggle_valu)
+			end
 		end)
 	end)
 
