@@ -2130,10 +2130,10 @@ function NEVERLOSE:Notification()
 	MainFrame.Name = "MainFrame"
 	MainFrame.Parent = Notification
 	MainFrame.AnchorPoint = Vector2.new(1, 1)
-	MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- changed color
-	MainFrame.BackgroundTransparency = 0.2 -- less transparent for visibility
-	MainFrame.BorderColor3 = Color3.fromRGB(0, 172, 247) -- accent color
-	MainFrame.BorderSizePixel = 1
+	MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	MainFrame.BackgroundTransparency = 1.000
+	MainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	MainFrame.BorderSizePixel = 0
 	MainFrame.Position = UDim2.new(0.99000001, 0, 0.99000001, 0)
 	MainFrame.Size = UDim2.new(0.35, 0, 0.100000001, 0)
 
