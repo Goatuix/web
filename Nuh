@@ -1,1 +1,47 @@
-goat hub
+-- Inside your protected script (the one loaded by loadstring)
+local HttpService = game:GetService("HttpService")
+local StarterGui = game:GetService("StarterGui")
+
+-- CONFIG (must match loader)
+local AppName = "1goat1_1's Application"
+local OwnerID = "jzFZ2kDRFW"
+local AppVersion = "1.0"
+
+-- Must be set by loader before this script runs
+local sessionid = rawget(_G, "KA_SESSION")
+
+if not sessionid then
+    StarterGui:SetCore("SendNotification", {
+        Title = "KeyAuth",
+        Text = "Unauthorized execution attempt (no session).",
+        Duration = 5
+    })
+    error("[KeyAuth] Missing sessionid (must run through loader)")
+end
+
+-- Verify session is still valid
+local verifyURL = "https://keyauth.win/api/1.1/?name="..
+    HttpService:UrlEncode(AppName)..
+    "&ownerid="..OwnerID..
+    "&type=check&sessionid="..sessionid..
+    "&ver="..AppVersion
+
+local ok, res = pcall(function()
+    return game:HttpGet(verifyURL)
+end)
+
+if not ok then
+    error("[KeyAuth] Failed to contact verification server: "..tostring(res))
+end
+
+local data = HttpService:JSONDecode(res)
+if not data.success then
+    StarterGui:SetCore("SendNotification", {
+        Title = "KeyAuth",
+        Text = "Session invalid: "..tostring(data.message),
+        Duration = 5
+    })
+    error("[KeyAuth] Unauthorized (invalid session)")
+end
+
+print("[KeyAuth] Secondary verification passed ✅")
