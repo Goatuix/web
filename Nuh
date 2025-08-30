@@ -1,18 +1,21 @@
--- ====== MAIN SCRIPT WITH WALK SPEED GUI & HARDCODED CREDENTIALS ======
+-- ====== SECONDARY VERIFICATION SCRIPT (FULL) ======
 
 -- ✅ Hardcoded credentials
-local expectedAppName   = "1goat1_1's Application"
-local expectedOwnerID   = "jzFZ2kDRFW"
+local expectedAppName    = "1goat1_1's Application"
+local expectedOwnerID    = "jzFZ2kDRFW"
 local expectedAppVersion = "1.0"
 
 -- Passed credentials from loader (_G)
-local loaderAppName   = _G.KeyAuthAppName
-local loaderOwnerID   = _G.KeyAuthOwnerID
-local loaderAppVersion = _G.KeyAuthAppVersion
-local sessionid = _G.KeyAuthSession
+local loaderAppName     = _G.KeyAuthAppName
+local loaderOwnerID     = _G.KeyAuthOwnerID
+local loaderAppVersion  = _G.KeyAuthAppVersion
+local sessionid         = _G.KeyAuthSession
 
 -- Kick immediately if invalid
-if loaderAppName ~= expectedAppName or loaderOwnerID ~= expectedOwnerID or loaderAppVersion ~= expectedAppVersion or not sessionid then
+if loaderAppName ~= expectedAppName 
+   or loaderOwnerID ~= expectedOwnerID 
+   or loaderAppVersion ~= expectedAppVersion 
+   or not sessionid then
     warn("[KeyAuth] Unauthorized! Invalid credentials or session.")
     pcall(function()
         game:GetService("Players").LocalPlayer:Kick("Unauthorized: Invalid credentials.")
@@ -21,12 +24,12 @@ if loaderAppName ~= expectedAppName or loaderOwnerID ~= expectedOwnerID or loade
 end
 
 -- ✅ Passed verification
-print("✅ KeyAuth verified. Running main script!")
+print("✅ KeyAuth verified. Running secondary script!")
 
 -- ===== WALK SPEED GUI =====
-local Players = game:GetService("Players")
+local Players     = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local PlayerGui   = LocalPlayer:WaitForChild("PlayerGui")
 
 -- Create GUI
 local screenGui = Instance.new("ScreenGui")
@@ -73,7 +76,7 @@ applyBtn.BackgroundColor3 = Color3.fromRGB(60,120,255)
 Instance.new("UICorner", applyBtn).CornerRadius = UDim.new(0,4)
 applyBtn.Parent = frame
 
--- Apply walkspeed
+-- Apply walkspeed logic
 applyBtn.MouseButton1Click:Connect(function()
     local speed = tonumber(speedBox.Text)
     if speed and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
@@ -84,8 +87,5 @@ applyBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- ===== OPTIONAL: Load original Pastebin script =====
-local ok, err = pcall(function()
-    loadstring(game:HttpGet("https://pastebin.com/raw/QJiPrppB"))()
-end)
-if not ok then warn("[MainScript] Failed to load Pastebin script:", err) end
+-- ===== END OF SCRIPT =====
+print("[SecondaryScript] WalkSpeed GUI ready. User verified.")
