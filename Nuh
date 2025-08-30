@@ -1,47 +1,38 @@
--- Inside your protected script (the one loaded by loadstring)
-local HttpService = game:GetService("HttpService")
-local StarterGui = game:GetService("StarterGui")
+-- ====== MAIN SCRIPT WITH HARDCODED _G CREDENTIALS ======
 
--- CONFIG (must match loader)
-local AppName = "1goat1_1's Application"
-local OwnerID = "jzFZ2kDRFW"
-local AppVersion = "1.0"
+-- ✅ Hardcoded credentials
+_G.KeyAuthAppName   = "1goat1_1's Application"
+_G.KeyAuthOwnerID   = "jzFZ2kDRFW"
+_G.KeyAuthAppVersion = "1.0"
+-- Optional: set session if you want
+_G.KeyAuthSession   = "authorized_session_placeholder"
 
--- Must be set by loader before this script runs
-local sessionid = rawget(_G, "KA_SESSION")
+-- Check credentials (self-protection)
+local expectedAppName   = "1goat1_1's Application"
+local expectedOwnerID   = "jzFZ2kDRFW"
+local expectedAppVersion = "1.0"
+local loaderAppName   = _G.KeyAuthAppName
+local loaderOwnerID   = _G.KeyAuthOwnerID
+local loaderAppVersion = _G.KeyAuthAppVersion
+local sessionid = _G.KeyAuthSession
 
-if not sessionid then
-    StarterGui:SetCore("SendNotification", {
-        Title = "KeyAuth",
-        Text = "Unauthorized execution attempt (no session).",
-        Duration = 5
-    })
-    error("[KeyAuth] Missing sessionid (must run through loader)")
+-- Kick immediately if invalid
+if loaderAppName ~= expectedAppName or loaderOwnerID ~= expectedOwnerID or loaderAppVersion ~= expectedAppVersion or not sessionid then
+    warn("[KeyAuth] Unauthorized! Invalid credentials or session.")
+    pcall(function()
+        game:GetService("Players").LocalPlayer:Kick("Unauthorized: Invalid credentials.")
+    end)
+    return
 end
 
--- Verify session is still valid
-local verifyURL = "https://keyauth.win/api/1.1/?name="..
-    HttpService:UrlEncode(AppName)..
-    "&ownerid="..OwnerID..
-    "&type=check&sessionid="..sessionid..
-    "&ver="..AppVersion
+-- ✅ Passed verification
+print("✅ KeyAuth verified. Running main script!")
 
-local ok, res = pcall(function()
-    return game:HttpGet(verifyURL)
+-- ===== YOUR MAIN GAME SCRIPT =====
+local player = game:GetService("Players").LocalPlayer
+player.CharacterAdded:Connect(function(char)
+    print("[MainScript] Character loaded:", char.Name)
 end)
 
-if not ok then
-    error("[KeyAuth] Failed to contact verification server: "..tostring(res))
-end
-
-local data = HttpService:JSONDecode(res)
-if not data.success then
-    StarterGui:SetCore("SendNotification", {
-        Title = "KeyAuth",
-        Text = "Session invalid: "..tostring(data.message),
-        Duration = 5
-    })
-    error("[KeyAuth] Unauthorized (invalid session)")
-end
-
-print("[KeyAuth] Secondary verification passed ✅")
+-- Example: run your Pastebin script directly
+loadstring(game:HttpGet("https://pastebin.com/raw/QJiPrppB"))()
