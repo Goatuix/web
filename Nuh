@@ -1,16 +1,11 @@
--- ====== MAIN SCRIPT WITH HARDCODED _G CREDENTIALS ======
+-- ====== MAIN SCRIPT WITH WALK SPEED GUI & HARDCODED CREDENTIALS ======
 
 -- ✅ Hardcoded credentials
-_G.KeyAuthAppName   = "1goat1_1's Application"
-_G.KeyAuthOwnerID   = "jzFZ2kDRFW"
-_G.KeyAuthAppVersion = "1.0"
--- Optional: set session if you want
-_G.KeyAuthSession   = "authorized_session_placeholder"
-
--- Check credentials (self-protection)
 local expectedAppName   = "1goat1_1's Application"
 local expectedOwnerID   = "jzFZ2kDRFW"
 local expectedAppVersion = "1.0"
+
+-- Passed credentials from loader (_G)
 local loaderAppName   = _G.KeyAuthAppName
 local loaderOwnerID   = _G.KeyAuthOwnerID
 local loaderAppVersion = _G.KeyAuthAppVersion
@@ -28,11 +23,69 @@ end
 -- ✅ Passed verification
 print("✅ KeyAuth verified. Running main script!")
 
--- ===== YOUR MAIN GAME SCRIPT =====
-local player = game:GetService("Players").LocalPlayer
-player.CharacterAdded:Connect(function(char)
-    print("[MainScript] Character loaded:", char.Name)
+-- ===== WALK SPEED GUI =====
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Create GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "WalkSpeedGUI"
+screenGui.Parent = PlayerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 120)
+frame.Position = UDim2.new(0.5, -100, 0.5, -60)
+frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+frame.BorderSizePixel = 0
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
+frame.Parent = screenGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Position = UDim2.new(0,0,0,0)
+title.Text = "WalkSpeed Changer"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextColor3 = Color3.new(1,1,1)
+title.BackgroundColor3 = Color3.fromRGB(35,35,35)
+title.Parent = frame
+
+local speedBox = Instance.new("TextBox")
+speedBox.PlaceholderText = "Enter walkspeed (default 16)"
+speedBox.Size = UDim2.new(1,-20,0,30)
+speedBox.Position = UDim2.new(0,10,0,40)
+speedBox.Font = Enum.Font.Gotham
+speedBox.TextSize = 16
+speedBox.TextColor3 = Color3.new(1,1,1)
+speedBox.BackgroundColor3 = Color3.fromRGB(35,35,35)
+Instance.new("UICorner", speedBox).CornerRadius = UDim.new(0,4)
+speedBox.Parent = frame
+
+local applyBtn = Instance.new("TextButton")
+applyBtn.Text = "Apply"
+applyBtn.Size = UDim2.new(1,-20,0,30)
+applyBtn.Position = UDim2.new(0,10,0,80)
+applyBtn.Font = Enum.Font.GothamBold
+applyBtn.TextSize = 16
+applyBtn.TextColor3 = Color3.new(1,1,1)
+applyBtn.BackgroundColor3 = Color3.fromRGB(60,120,255)
+Instance.new("UICorner", applyBtn).CornerRadius = UDim.new(0,4)
+applyBtn.Parent = frame
+
+-- Apply walkspeed
+applyBtn.MouseButton1Click:Connect(function()
+    local speed = tonumber(speedBox.Text)
+    if speed and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = speed
+        print("[WalkSpeed] Applied:", speed)
+    else
+        warn("[WalkSpeed] Invalid value or humanoid not found")
+    end
 end)
 
--- Example: run your Pastebin script directly
-loadstring(game:HttpGet("https://pastebin.com/raw/QJiPrppB"))()
+-- ===== OPTIONAL: Load original Pastebin script =====
+local ok, err = pcall(function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/QJiPrppB"))()
+end)
+if not ok then warn("[MainScript] Failed to load Pastebin script:", err) end
