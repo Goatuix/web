@@ -7,26 +7,25 @@ local Camera  = workspace.CurrentCamera
 local LP      = Players.LocalPlayer
 local mouse   = LP:GetMouse()
 
--- State (shared with GUI)
 getgenv().SA = getgenv().SA or {
-  Enabled    = false,
-  ShowFov    = false,
-  TargetPart = "HumanoidRootPart",
-  FovRadius  = 150,
-  Highlight  = false
+  Enabled     = false,
+  ShowFov     = false,
+  TargetPart  = "HumanoidRootPart",
+  FovRadius   = 150,
+  Highlight   = false
 }
 local SA = getgenv().SA
 
+
 getgenv().fov = getgenv().fov or Drawing.new("Circle")
 local fov = getgenv().fov
-fov.Thickness    = 1
-fov.NumSides     = 40
-fov.Color        = Color3.fromRGB(0, 255, 255)
+fov.Thickness, fov.NumSides = 1, 40
+fov.Color = Color3.fromRGB(0,255,255)
 fov.Transparency = 0.7
-fov.Filled       = false
-fov.Visible      = false
+fov.Filled = false
+fov.Visible = false
 
--- Per-player Highlight
+
 local highlights = {} -- [Player] = Highlight
 local function ensureHighlightForPlayer(plr)
   if not plr then return end
@@ -39,25 +38,34 @@ local function ensureHighlightForPlayer(plr)
     h.Parent = CoreGui
     highlights[plr] = h
   end
-  h.Adornee = plr.Character
+  h.Adornee = plr.Character -- update every time
   h.Enabled = true
 end
 
-local function clearHighlights(except)
+local function clearHighlights(except) 
   for plr, h in pairs(highlights) do
     if not except or not except[plr] then
       h.Enabled = false
-      h.Adornee = plr.Character
+      h.Adornee = plr.Character -- keep up-to-date for re-enable
     end
   end
 end
 
--- Render driver: FOV + optional highlight
-local renderConn; if renderConn then renderConn:Disconnect() end
-renderConn = RS.RenderStepped:Connect(function()
+
+Players.PlayerRemoving:Connect(function(plr)
+  local h = highlights[plr]
+  if h then
+    h:Destroy()
+    highlights[plr] = nil
+  end
+end)
+
+-- Render driver: keeps FOV and highlights correct every frame
+if getgenv().SA_RENDER then getgenv().SA_RENDER:Disconnect() end
+getgenv().SA_RENDER = RS.RenderStepped:Connect(function()
+  
   fov.Radius  = SA.FovRadius
   fov.Visible = SA.ShowFov
-
   local centre
   if UIS.TouchEnabled then
     centre = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
@@ -67,6 +75,7 @@ renderConn = RS.RenderStepped:Connect(function()
   end
   fov.Position = centre
 
+ 
   if SA.Highlight then
     local keep = {}
     for _, p in ipairs(Players:GetPlayers()) do
@@ -91,8 +100,7 @@ renderConn = RS.RenderStepped:Connect(function()
   end
 end)
 
--- Hook: mouse.__index (Hit/Target)
--- Robust to overwrites; reapply if replaced by other scripts
+
 local mt = getrawmetatable(game)
 local originalIndex = mt.__index
 local hookFn
@@ -103,28 +111,28 @@ local function applyHook()
     hookFn = newcclosure(function(t, k)
       if SA.Enabled and t == mouse and (k == "Hit" or k == "Target") then
         local centre = fov.Position
-        local closest, dst = nil, SA.FovRadius
+        local best, dst = nil, SA.FovRadius
 
+        -- Fresh iteration every call (handles deaths/respawns)
         for _, p in ipairs(Players:GetPlayers()) do
           if p ~= LP then
             local ch   = p.Character
-            local part = ch and ch:FindFirstChild(SA.TargetPart)
             local hum  = ch and ch:FindFirstChildOfClass("Humanoid")
+            local part = ch and ch:FindFirstChild(SA.TargetPart or "HumanoidRootPart")
             if part and hum and hum.Health > 0 and part:IsA("BasePart") then
               local vec, onScreen = Camera:WorldToScreenPoint(part.Position)
               if onScreen then
                 local d = (Vector2.new(vec.X, vec.Y) - centre).Magnitude
-                if d < dst then closest, dst = part, d end
+                if d < dst then best, dst = part, d end
               end
             end
           end
         end
 
-        if closest then
-          return (k == "Hit") and CFrame.new(closest.Position) or closest
+        if best then
+          return (k == "Hit") and CFrame.new(best.Position) or best
         end
       end
-
       return originalIndex(t, k)
     end)
     mt.__index = hookFn
@@ -133,59 +141,22 @@ local function applyHook()
   return ok
 end
 
--- Keep hook alive
 if applyHook() then
   getgenv().SA_HOOK_APPLIED = true
-  if getgenv().SA_REHOOK_CONN then
-    getgenv().SA_REHOOK_CONN:Disconnect()
-  end
-  getgenv().SA_REHOOK_CONN = RS.RenderStepped:Connect(function()
+  if getgenv().SA_REHOOK then getgenv().SA_REHOOK:Disconnect() end
+  getgenv().SA_REHOOK = RS.RenderStepped:Connect(function()
     if getrawmetatable(game).__index ~= hookFn then
       applyHook()
     end
   end)
 end
 
--- Public API for GUI (no raw tables from GUI required)
+
 getgenv().SilentAim = getgenv().SilentAim or {}
 local API = getgenv().SilentAim
 
-function API.SetEnabled(v)
-  SA.Enabled = not not v
-end
-
-function API.SetShowFov(v)
-  SA.ShowFov = not not v
-  fov.Visible = SA.ShowFov
-end
-
-function API.SetHighlight(v)
-  SA.Highlight = not not v
-  if not SA.Highlight then
-    clearHighlights(nil)
-  end
-end
-
-function API.SetTargetPart(partName)
-  if partName == "Head" or partName == "HumanoidRootPart" then
-    SA.TargetPart = partName
-  end
-end
-
-function API.SetFovRadius(r)
-  local n = tonumber(r)
-  if n then
-    SA.FovRadius = math.clamp(math.floor(n + 0.5), 10, 1000)
-  end
-end
-
--- Optional: expose current config getters (if needed by GUI)
-API.GetConfig = function()
-  return {
-    Enabled    = SA.Enabled,
-    ShowFov    = SA.ShowFov,
-    Highlight  = SA.Highlight,
-    TargetPart = SA.TargetPart,
-    FovRadius  = SA.FovRadius
-  }
-end
+function API.SetEnabled(v)   SA.Enabled = not not v end
+function API.SetShowFov(v)   SA.ShowFov = not not v; fov.Visible = SA.ShowFov end
+function API.SetHighlight(v) SA.Highlight = not not v; if not SA.Highlight then clearHighlights(nil) end end
+function API.SetTargetPart(p) if p == "Head" or p == "HumanoidRootPart" then SA.TargetPart = p end end
+function API.SetFovRadius(r) local n = tonumber(r); if n then SA.FovRadius = math.clamp(math.floor(n + 0.5), 10, 1000) end end
